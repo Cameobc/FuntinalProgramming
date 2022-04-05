@@ -65,6 +65,61 @@ var obj2 = add5(obj1, 4);
 console.log("obj1.val ::: ", obj1.val);
 console.log("obj2.val ::: ", obj2.val);
 
+
+/**
+ * 일급함수
+ * : 함수를 값으로 다룰 수 있다.
+ * : runtime 에서 언제나 정의할 수 있음
+ * : 인자로 넘기거나 다른 함수가 실행할 수 있음
+ */
+var f1 = function(a){ return a *a; };
+console.log(f1);
+
+var f2 = add;
+console.log(f2);
+
+function f3(f){
+    return f();
+}
+
+console.log(f3(function() {return 10;}));
+console.log(f3(function() {return 20;}));
+
+/**
+ * add_maker
+ * 함수를 리턴하는 함수
+ **/
+function add_maker(a){
+    /* 클로저 */
+    return function(b){
+        return a+b;
+    }
+}
+
+// 또한 순수함수이기도 하다. 참조를 할 뿐 변경을 하지 않기 때문에.
+// 클로저이기도 하다. a 라는 값을 참조하고 있기 때문에 a 라는 값을 기억하고 있는 클로저가 된다.
+// add10 = function(b){return a+b;}
+var add10 = add_maker(10);
+console.log(add10(20));
+
+var add5 = add_maker(5);
+var add15 = add_maker(15);
+
+console.log(add5(10));
+console.log(add15(10));
+
+
+function f4(f1, f2, f3) {
+    // f3(2 + 1);
+    //
+    return f3(f1() + f2());
+}
+
+console.log(f4(
+    function(){return 2;},
+    function(){return 1;},
+    function(a){return a * a;}
+));
 </script>
 </body>
 </html>
