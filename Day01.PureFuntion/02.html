@@ -90,6 +90,165 @@
         // 2. 외부 다형성
             // 1. array_like, arguments, document.querySelectorAll
 
+    // 여기서 사용한 map 과 filter 은 정확히 말하자면 함수가 아닌 메서드이다.
+    // 메서드는 순수 함수가 아니며 객체에 상태에 따라 결과가 달라지는 특징을 지님
+    // 메서드는 객체 지향 프로그램이다.
+    // 메서드의 특징
+    // -> 해당 클래스에 정의되기 때문에 해당 클래스의 인스턴스에서만 사용 가능
+    // ex) map 은 Array 에서만 사용 가능함.
+
+    console.log(
+        [1, 2, 3].map(function(val){
+            return val * 2;
+        })
+    );
+
+    console.log(
+        [1, 2, 3, 4].filter(function(val){
+            return val % 2;
+        })
+    );
+
+
+    // constructor : NodeList
+    console.log(
+        document.querySelectorAll('*')
+    );
+
+    // document.querySelectorAll 는 Array_like임. 배열이 아님.
+    // document.querySelectorAll('*') != Array 이기 때문에 에러 발생
+    /*console.log(
+        document.querySelectorAll('*').map(function(node){
+            return node.nodeName;
+        })
+    );*/
+
+    console.log(
+       _map( document.querySelectorAll('*'), (function(node){
+            return node.nodeName;
+        }))
+    );
+
+    // 함수가 먼저 나오는 프로그래밍은 데이터가 있기 전부터 함수가 존재하지만,
+    // 데이터가 먼저 나오는 프로그래밍은 데이터가 나와야 메서드가 생긴다.
+    // 그래서 평가의 순서가 굉장히 중요하며, 함수는 혼자 먼저 존재하기 때문에 평가 시점이 상대적으로 훨씬 유연하다.
+    // 이를 이용하여 더 높은 조합성을 만들 수 있다.
+
+       // 3. 내부 다형성
+            // 1. predi, iter, mapper 와 같은 보조 함수가 책임을 진다.
+    _map([1, 2, 3, 4], function (v) {
+        return v + 10;
+    });
+
+    // 3. 커링 : 함수의 인자를 하나씩 적용해 나가다가 필요한 인자가 모두 채워지면 함수 본체를 실행하는 기법
+    // JS 에서는 커링이 지원되지 않지만, 일급함수가 지원되고 평가 시점이 달라 구현 가능
+        // 1. _curry, _curryr
+        function _curry(fn) {
+            return function (a, b) {
+                return arguments.length == 2 ? fn(a, b) : function (b) {
+                    return fn(a, b);
+                }
+            }
+        }
+
+
+        function _curryr(fn) {
+            return function (a, b) {
+                return arguments.length == 2 ? fn(a, b) : function (b) {
+                    return fn(b, a);
+                }
+
+            }
+        }
+      /*  var add = function (a, b) {
+            return a + b;
+        };*/
+
+    /*
+    _curry  의 결과
+    return function (a) {
+        return function (b) {
+            return fn(a, b);
+        }
+    }*/
+    var add = _curry (function (a, b ){
+        return a + b;
+    });
+
+    /*
+    add 를 처음 실행할 때의 결과
+    function (b) {
+        return fn(a, b);
+    }*/
+    var add10 = add(10);
+    console.log(add10(6));
+
+    console.log(add(5)(3));
+    console.log(add(1, 2));
+
+
+    var sub = _curry(function (a, b) {
+        return a - b;
+    });
+
+    var subr = _curryr(function (a, b) {
+        return a - b;
+    });
+
+    console.log(sub(10, 5));
+
+    // 오른쪽부터 인자를 적용해 나가는 _curryr 만들기
+    var sub10 = sub(10);
+    console.log(sub10(5));
+
+    var sub10 = subr(10);
+    console.log(sub10(5));
+
+
+
+        // 2. _get 만들어 좀 더 간단하게 하기
+        // object 에 있는 값을 안전하게 참조
+    var _get = _curryr(function(obj, key) {
+        return obj == null ? undefined : obj[key];
+    });
+
+    var user1 = users[0];
+    console.log(user1.name);
+    console.log(_get(user1, 'name'));
+    console.log(_get('name')(user1));
+
+    var getName = _get('name');
+    console.log(getName(user1));
+    console.log(getName(users[2]));
+
+    console.log(_map(
+        _filter(users, function(user){return user.age >= 30;})
+        , _get('name')
+    ));
+
+    console.log(_map(
+        _filter(users, function(user){return user.age < 30;})
+        , _get('age')
+    ));
+
+    // 4. _reudce 만들기
+
+
+    // 5. 파이프라인 만들기
+        // 1. _pipe
+
+
+        // 2. _go
+
+
+        // 3. users 에 _go 적용
+
+
+        // 4. 화살표 함수 간단히
+
+
+    // 6. _each 의 외부 다형성 높이기
+
 </script>
 </body>
 </html>
